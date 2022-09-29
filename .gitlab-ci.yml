@@ -1,0 +1,88 @@
+image: python:latest
+
+# Change pip's cache directory to be inside the project directory since we can
+# only cache local items.
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+# Pip's cache doesn't store the python packages
+# https://pip.pypa.io/en/stable/topics/caching/
+#
+# If you want to also cache the installed packages, you have to install
+# them in a virtualenv and cache it as well.
+cache:
+  paths:
+    - .cache/pip
+    - venv/
+
+before_script:
+  - python --version  # For debugging
+  - pip install virtualenv
+  - virtualenv venv
+  - source venv/bin/activate
+
+stages:
+  - build
+  - test
+  - deploy
+
+build:
+  stage: build
+  script:
+    - pip install git+https://github.com/jlskuz/OpenTimelineIO@work/split-kdenlive
+#    - pip install -V OpenTimelineIO
+    - python setup.py bdist_wheel
+    - pip install dist/*
+  artifacts:
+    paths:
+      - dist/*.whl
+
+unit-test:
+  stage: test
+  script:
+    - pip install git+https://github.com/jlskuz/OpenTimelineIO@work/split-kdenlive
+#    - pip install -V OpenTimelineIO
+    - echo "Running unit tests..."
+    - pytest
+
+lint-test:
+  stage: test
+  script:
+    - echo "Linting code..."
+    - flake8 --show-source --statistics
+
+deploy-to-gitlab:
+  stage: deploy
+  when: manual
+  environment: development
+  script:
+    - pip install twine
+    - TWINE_PASSWORD=${CI_JOB_TOKEN} TWINE_USERNAME=gitlab-ci-token python -m twine upload --repository-url ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi dist/*
+#  only:
+#    - tags
+
+deploy-to-test-pypi-org:
+  stage: deploy
+  when: manual
+  environment: production
+  script:
+    - pip install twine
+    - TWINE_PASSWORD=${TESTPYPIORG_TOKEN} TWINE_USERNAME=${TESTPYPIORG_USERNAME} python -m twine upload --repository testpypi dist/*
+#  only:
+#    refs:
+#        - master
+#  only:
+#    - tags
+
+deploy-to-pypi-org:
+  stage: deploy
+  when: manual
+  environment: production
+  script:
+    - pip install build twine
+    - TWINE_PASSWORD=${PYPIORG_TOKEN} TWINE_USERNAME=${PYPIORG_USERNAME} python -m twine upload --repository pypi dist/*
+#  only:
+#    refs:
+#        - master
+#  only:
+#    - tags
