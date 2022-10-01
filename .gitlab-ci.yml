@@ -1,25 +1,14 @@
 image: python:latest
 
-# Change pip's cache directory to be inside the project directory since we can
-# only cache local items.
-variables:
-  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-
-# Pip's cache doesn't store the python packages
-# https://pip.pypa.io/en/stable/topics/caching/
-#
-# If you want to also cache the installed packages, you have to install
-# them in a virtualenv and cache it as well.
-cache:
-  paths:
-    - .cache/pip
-    - venv/
-
 before_script:
   - python --version  # For debugging
   - pip install virtualenv
   - virtualenv venv
   - source venv/bin/activate
+  # TODO: at the moment the offical repository and package do still contain
+  # the kdenlive adapter and we need to use a fork with it removed
+  - pip install git+https://github.com/jlskuz/OpenTimelineIO@work/split-kdenlive
+#  - pip install -V OpenTimelineIO
 
 stages:
   - build
@@ -29,27 +18,26 @@ stages:
 build:
   stage: build
   script:
-    - pip install git+https://github.com/jlskuz/OpenTimelineIO@work/split-kdenlive
-#    - pip install -V OpenTimelineIO
     - python setup.py bdist_wheel
     - pip install dist/*
   artifacts:
     paths:
       - dist/*.whl
 
-unit-test:
+test:
   stage: test
   script:
-    - pip install git+https://github.com/jlskuz/OpenTimelineIO@work/split-kdenlive
-#    - pip install -V OpenTimelineIO
+    - pip install pytest-cov flake8 flake8-junit-report
+    - pip install dist/*
     - echo "Running unit tests..."
-    - pytest
-
-lint-test:
-  stage: test
-  script:
+    - pytest --cov=src --junitxml=JUnitTestResults.xml
     - echo "Linting code..."
-    - flake8 --show-source --statistics
+    - flake8 --show-source --statistics --output-file=flake8Output.txt
+    - flake8_junit flake8Output.txt JUnitLintResults.xml
+  artifacts:
+    reports:
+      junit: JUnit*Results.xml
+
 
 deploy-to-gitlab:
   stage: deploy
@@ -58,8 +46,8 @@ deploy-to-gitlab:
   script:
     - pip install twine
     - TWINE_PASSWORD=${CI_JOB_TOKEN} TWINE_USERNAME=gitlab-ci-token python -m twine upload --repository-url ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi dist/*
-#  only:
-#    - tags
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 deploy-to-test-pypi-org:
   stage: deploy
@@ -68,11 +56,8 @@ deploy-to-test-pypi-org:
   script:
     - pip install twine
     - TWINE_PASSWORD=${TESTPYPIORG_TOKEN} TWINE_USERNAME=${TESTPYPIORG_USERNAME} python -m twine upload --repository testpypi dist/*
-#  only:
-#    refs:
-#        - master
-#  only:
-#    - tags
+  rules:
+    - if: $CI_COMMIT_TAG
 
 deploy-to-pypi-org:
   stage: deploy
@@ -81,8 +66,5 @@ deploy-to-pypi-org:
   script:
     - pip install build twine
     - TWINE_PASSWORD=${PYPIORG_TOKEN} TWINE_USERNAME=${PYPIORG_USERNAME} python -m twine upload --repository pypi dist/*
-#  only:
-#    refs:
-#        - master
-#  only:
-#    - tags
+  rules:
+    - if: $CI_COMMIT_TAG
