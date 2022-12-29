@@ -5,9 +5,9 @@ before_script:
   - pip install virtualenv
   - virtualenv venv
   - source venv/bin/activate
-  # TODO: at the moment the offical repository and package do still contain
-  # the kdenlive adapter and we need to use a fork with it removed
-  - pip install git+https://github.com/jlskuz/OpenTimelineIO@work/split-kdenlive
+  # TODO: at the moment the release package does still contain
+  # the kdenlive adapter and we need to use the git version
+  - pip install git+https://github.com/AcademySoftwareFoundation/OpenTimelineIO
 #  - pip install -V OpenTimelineIO
 
 stages:
