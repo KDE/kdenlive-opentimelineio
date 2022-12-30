@@ -30,7 +30,7 @@ test:
     - pip install pytest-cov flake8 flake8-junit-report
     - pip install dist/*
     - echo "Running unit tests..."
-    - pytest --cov=src --junitxml=JUnitTestResults.xml
+    - pytest --cov=./ --junitxml=JUnitTestResults.xml
     - echo "Linting code..."
     - flake8 --show-source --statistics --output-file=flake8Output.txt
     - flake8_junit flake8Output.txt JUnitLintResults.xml
