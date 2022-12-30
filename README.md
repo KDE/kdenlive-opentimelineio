@@ -55,3 +55,9 @@ The OpenTimelineIO documentation can be found here: https://opentimelineio.readt
 
 It's always a good idea to write unit tests for you code.
 Please provide tests that run against supported versions of python and OpenTimelineIO.
+
+To run the unit tests do
+```bash
+# In the root folder of the repo
+pytest
+```

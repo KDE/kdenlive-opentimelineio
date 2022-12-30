@@ -253,7 +253,7 @@ def read_from_string(input_str):
                 item = item_from_xml(xml_item, rate, byid, bin_producer_name)
                 if item:
                     mixTrack.append(item)
-            if mixTrack.clip_if():
+            if mixTrack.find_clips():
                 stack.append(mixTrack)
 
         # process "mixes" (same-track-transitions)
@@ -266,12 +266,12 @@ def read_from_string(input_str):
             if mix_range is None:
                 continue
 
-            found_clip = stack[0].clip_if(search_range=mix_range)[0]
+            found_clip = stack[0].find_clips(search_range=mix_range)[0]
             resize_item(found_clip,
                         - (after_mix_cut if reverse else before_mix_cut),
                         not reverse)
 
-            found_clip = stack[1].clip_if(search_range=mix_range)[0]
+            found_clip = stack[1].find_clips(search_range=mix_range)[0]
             resize_item(found_clip,
                         - (before_mix_cut if reverse else after_mix_cut),
                         reverse)
@@ -285,7 +285,7 @@ def read_from_string(input_str):
             if mix_range is None:
                 continue
 
-            found_clip = track.clip_if(
+            found_clip = track.find_clips(
                 search_range=otio.opentime.TimeRange.range_from_start_end_time(
                     start_time=(time(mix.get('in'), rate)
                                 - otio.opentime.RationalTime(
@@ -425,7 +425,7 @@ def write_to_string(input_otio):
     producer_count = 0
 
     media_prod = {}
-    for clip in input_otio.each_clip():
+    for clip in input_otio.find_clips():
         producer, producer_count = _make_producer(
             producer_count, clip, mlt, rate, media_prod
         )

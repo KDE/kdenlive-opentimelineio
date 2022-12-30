@@ -18,7 +18,7 @@ def prepare_for_check(timeline):
     we do not care about its name. Same applies to reference names."""
     timeline.name = ""
     for track in timeline.tracks:
-        for clip in track.clip_if():
+        for clip in track.find_clips():
             if isinstance(clip.media_reference, list):
                 for reference in clip.media_reference:
                     reference.name = ""
@@ -158,9 +158,9 @@ class AdaptersKdenliveTest(unittest.TestCase, otio_test_utils.OTIOAssertions):
         self.assertEqual(len(video_track_mix), 15)
         self.assertEqual(len(audio_track_mix), 15)
 
-        clips_normal = list(video_track_normal.clip_if())
+        clips_normal = list(video_track_normal.find_clips())
         self.assertEqual(len(clips_normal), 8)
-        clips_mix = list(video_track_mix.clip_if())
+        clips_mix = list(video_track_mix.find_clips())
         self.assertEqual(len(clips_mix), 8)
 
         normal_item_order = [

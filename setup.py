@@ -27,7 +27,7 @@ setuptools.setup(
         ],
     },
     install_requires=[
-        "OpenTimelineIO >= 0.14.0"
+        "OpenTimelineIO >= 0.15.0"
     ],
     extras_require={
         "dev": [
