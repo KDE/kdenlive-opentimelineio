@@ -335,6 +335,13 @@ class AdaptersKdenliveTest(unittest.TestCase, otio_test_utils.OTIOAssertions):
                     self.assertTrue(clip.source_range.start_time >= clip.available_range().start_time)
                     self.assertTrue(clip.source_range.end_time_inclusive() <= clip.available_range().end_time_inclusive())
 
+    def test_clock_time(self):
+        tc = "00:00:01.040"
+        rate = 25
+        t = kdenlive_adapter.time(tc, rate)
+        c = kdenlive_adapter.clock(t)
+        self.assertEqual(tc, c)
+
 
 if __name__ == '__main__':
     print(kdenlive_adapter)
