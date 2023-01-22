@@ -1,5 +1,7 @@
-# SPDX-License-Identifier: CC-BY-SA-4.0
-# SPDX-FileCopyrightText: 2022 Julius Künzel <jk.kdedev@smartlab.uber.space>
+<!--
+    SPDX-License-Identifier: CC-BY-SA-4.0
+    SPDX-FileCopyrightText: 2022 Julius Künzel <jk.kdedev@smartlab.uber.space>
+-->
 
 
 # OpenTimelineIO Kdenlive Adapter
@@ -64,4 +66,9 @@ To run the unit tests do
 ```bash
 # In the root folder of the repo
 pytest
+```
+
+Before pushing changes you should also run the linter
+```bash
+flake8 --show-source
 ```
