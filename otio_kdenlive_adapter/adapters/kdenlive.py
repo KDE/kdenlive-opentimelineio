@@ -332,6 +332,7 @@ def write_property(element, name, value):
     property = ET.SubElement(element, 'property', {'name': name})
     property.text = value
 
+
 def clock(time):
     """Encode time to an MLT timecode string
     after format hours:minutes:seconds.floatpart"""
@@ -434,18 +435,17 @@ def write_to_string(input_otio):
             # There is already a producer for this clip
             # make sure it covers the clip's range
             producer = producer_array[key]
-            producer_range = otio.opentime.TimeRange.range_from_start_end_time_inclusive(
+            prod_range = otio.opentime.TimeRange.range_from_start_end_time_inclusive(
                 time(producer.get('in'), rate),
                 time(producer.get('out'), rate)
             ).extended_by(clip.source_range)
-            producer.set('in', clock(producer_range.start_time))
-            producer.set('out', clock(producer_range.end_time_inclusive()))
+            producer.set('in', clock(prod_range.start_time))
+            producer.set('out', clock(prod_range.end_time_inclusive()))
             write_property(
                 producer, 'length',
-                str(producer_range.duration.to_frames())
+                str(prod_range.duration.to_frames())
             )
         producer_array[key] = producer
-
 
     for key in producer_array:
         producer = producer_array[key]
