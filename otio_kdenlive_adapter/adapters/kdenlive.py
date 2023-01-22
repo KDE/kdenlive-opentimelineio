@@ -336,7 +336,7 @@ def write_property(element, name, value):
 def clock(time):
     """Encode time to an MLT timecode string
     after format hours:minutes:seconds.floatpart"""
-    frames = time.value
+    frames = time.to_frames()
     hours = int(frames / (time.rate * 3600))
     frames -= int(hours * 3600 * time.rate)
     mins = int(frames / (time.rate * 60))
@@ -363,7 +363,7 @@ def write_markers(markers):
             marker_type = 0
         markers_array.append(
             {
-                "pos": int(marker.marked_range.start_time.value),
+                "pos": marker.marked_range.start_time.to_frames(),
                 "comment": marker.name,
                 "type": marker_type
             }
@@ -726,7 +726,7 @@ def _make_producer(count, item, mlt, frame_rate, media_prod, speed=None,
                     write_property(producer, 'kdenlive:clipname', item.name)
             write_property(
                 producer, 'length',
-                str(int(duration.value)),
+                str(duration.to_frames()),
             )
             write_property(producer, 'kdenlive:id', kdenlive_id)
             if (isinstance(item.media_reference,

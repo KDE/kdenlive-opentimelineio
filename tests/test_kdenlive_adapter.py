@@ -67,9 +67,9 @@ class AdaptersKdenliveTest(unittest.TestCase, otio_test_utils.OTIOAssertions):
                         (466, 'Green', otio.schema.MarkerColor.GREEN))
 
         for n, marker in enumerate(timeline.tracks.markers):
-            self.assertEqual(0, marker.marked_range.duration.value)
+            self.assertEqual(0, marker.marked_range.duration.to_frames())
             self.assertEqual(markers_data[n][0],
-                             marker.marked_range.start_time.value)
+                             marker.marked_range.start_time.to_frames())
             self.assertEqual(markers_data[n][1], marker.name)
             self.assertEqual(markers_data[n][2], marker.color)
 
@@ -127,7 +127,7 @@ class AdaptersKdenliveTest(unittest.TestCase, otio_test_utils.OTIOAssertions):
         new_timeline = otio.adapters.read_from_string(kdenlive_xml, "kdenlive")
         troublesome_clip = new_timeline.video_tracks()[0][35]
         self.assertEqual(
-            troublesome_clip.source_range.duration.value,
+            troublesome_clip.source_range.duration.to_frames(),
             807,
         )
 
@@ -219,8 +219,8 @@ class AdaptersKdenliveTest(unittest.TestCase, otio_test_utils.OTIOAssertions):
                      (115, 214),
                      (44, 114))
         for x, mix in enumerate(filter(only_transitions, video_track_mix)):
-            duration = mix.in_offset.value + mix.out_offset.value
-            self.assertEqual(mix.in_offset.value, mix_times[x][0])
+            duration = mix.in_offset.to_frames() + mix.out_offset.to_frames()
+            self.assertEqual(mix.in_offset.to_frames(), mix_times[x][0])
             self.assertEqual(duration, mix_times[x][1])
 
         mix_times = ((13, 25),
@@ -229,8 +229,8 @@ class AdaptersKdenliveTest(unittest.TestCase, otio_test_utils.OTIOAssertions):
                      (13, 25),
                      (44, 114))
         for x, mix in enumerate(filter(only_transitions, audio_track_mix)):
-            duration = mix.in_offset.value + mix.out_offset.value
-            self.assertEqual(mix.in_offset.value, mix_times[x][0])
+            duration = mix.in_offset.to_frames() + mix.out_offset.to_frames()
+            self.assertEqual(mix.in_offset.to_frames(), mix_times[x][0])
             self.assertEqual(duration, mix_times[x][1])
 
     def test_fun_read_mix(self):
@@ -257,7 +257,7 @@ class AdaptersKdenliveTest(unittest.TestCase, otio_test_utils.OTIOAssertions):
         self.assertEqual(after_mix_cut,
                          otio.opentime.RationalTime(2 * rate, rate)
                          - otio.opentime.RationalTime(16, rate))
-        self.assertEqual(reverse, True)
+        self.assertTrue(reverse)
 
     def test_read_clip_markers(self):
         # clip markers are yet only supported to be read, not written
@@ -286,9 +286,9 @@ class AdaptersKdenliveTest(unittest.TestCase, otio_test_utils.OTIOAssertions):
                     (2899, 'Orange', otio.schema.MarkerColor.ORANGE))
 
                 for n, marker in enumerate(clip.markers):
-                    self.assertEqual(0, marker.marked_range.duration.value)
+                    self.assertEqual(0, marker.marked_range.duration.to_frames())
                     self.assertEqual(markers_data[n][0],
-                                     marker.marked_range.start_time.value)
+                                     marker.marked_range.start_time.to_frames())
                     self.assertEqual(markers_data[n][1], marker.name)
                     self.assertEqual(markers_data[n][2], marker.color)
 
