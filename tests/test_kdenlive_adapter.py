@@ -309,6 +309,32 @@ class AdaptersKdenliveTest(unittest.TestCase, otio_test_utils.OTIOAssertions):
         prepare_for_check(new_timeline)
         self.assertIsOTIOEquivalentTo(timeline, new_timeline)
 
+    def test_multiple_instances(self):
+        # If we have multiple instances of a clip, we need to ensure
+        # that for all of them the available_range covers the source_range.
+        # There was a bug where the available_range and hence the bin clip only covered the source_range
+        # of the first clip that was processed if available_range was None in the input file.
+        timeline = otio.adapters.read_from_file(
+            os.path.join(
+                os.path.dirname(__file__),
+                "sample_data",
+                "multiinstance.otio",
+            ),
+        )
+
+        kdenlive_xml = otio.adapters.write_to_string(timeline, "kdenlive")
+        self.assertIsNotNone(kdenlive_xml)
+
+        new_timeline = otio.adapters.read_from_string(kdenlive_xml, "kdenlive")
+        prepare_for_check(timeline)
+        prepare_for_check(new_timeline)
+
+        for track in new_timeline.tracks:
+            for clip in track.find_clips():
+                if clip.media_reference.available_range:
+                    self.assertTrue(clip.source_range.start_time >= clip.available_range().start_time)
+                    self.assertTrue(clip.source_range.end_time_inclusive() <= clip.available_range().end_time_inclusive())
+
 
 if __name__ == '__main__':
     print(kdenlive_adapter)

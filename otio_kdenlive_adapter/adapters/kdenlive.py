@@ -332,7 +332,6 @@ def write_property(element, name, value):
     property = ET.SubElement(element, 'property', {'name': name})
     property.text = value
 
-
 def clock(time):
     """Encode time to an MLT timecode string
     after format hours:minutes:seconds.floatpart"""
@@ -425,24 +424,44 @@ def write_to_string(input_otio):
     producer_count = 0
 
     media_prod = {}
+    producer_array = {}
     for clip in input_otio.find_clips():
         producer, producer_count = _make_producer(
             producer_count, clip, mlt, rate, media_prod
         )
-        if producer is not None:
-            producer_id = producer.get('id')
-            kdenlive_id = read_property(producer, 'kdenlive:id')
-            entry_in = producer.get('in')
-            entry_out = producer.get('out')
-            entry = ET.SubElement(
-                main_bin, 'entry',
-                {
-                    'producer': producer_id,
-                    'in': entry_in,
-                    'out': entry_out,
-                },
+        key = _prod_key_from_item(clip, None)
+        if producer is None:
+            # There is already a producer for this clip
+            # make sure it covers the clip's range
+            producer = producer_array[key]
+            producer_range = otio.opentime.TimeRange.range_from_start_end_time_inclusive(
+                time(producer.get('in'), rate),
+                time(producer.get('out'), rate)
+            ).extended_by(clip.source_range)
+            producer.set('in', clock(producer_range.start_time))
+            producer.set('out', clock(producer_range.end_time_inclusive()))
+            write_property(
+                producer, 'length',
+                str(producer_range.duration.to_frames())
             )
-            write_property(entry, 'kdenlive:id', kdenlive_id)
+        producer_array[key] = producer
+
+
+    for key in producer_array:
+        producer = producer_array[key]
+        producer_id = producer.get('id')
+        kdenlive_id = read_property(producer, 'kdenlive:id')
+        entry_in = producer.get('in')
+        entry_out = producer.get('out')
+        entry = ET.SubElement(
+            main_bin, 'entry',
+            {
+                'producer': producer_id,
+                'in': entry_in,
+                'out': entry_out,
+            },
+        )
+        write_property(entry, 'kdenlive:id', kdenlive_id)
 
     mlt.append(main_bin)
 
