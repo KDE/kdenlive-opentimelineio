@@ -1,0 +1,13 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: OpenTimelineIO Kdenlive Adapter
+Upstream-Contact: kdenlive@kde.org
+Source: https://invent.kde.org/multimedia/kdenlive-opentimelineio
+
+
+Files: tests/sample_data/*
+Copyright: none
+License: CC0-1.0
+
+Files: otio_kdenlive_adapter/plugin_manifest.json
+Copyright: none
+License: CC0-1.0

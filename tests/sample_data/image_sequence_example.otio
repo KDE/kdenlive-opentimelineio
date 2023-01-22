@@ -1,7 +1,7 @@
 {
     "OTIO_SCHEMA": "Timeline.1",
     "metadata": {},
-    "name": "",
+    "name": "ImageSequenceTest",
     "global_start_time": null,
     "tracks": {
         "OTIO_SCHEMA": "Stack.1",

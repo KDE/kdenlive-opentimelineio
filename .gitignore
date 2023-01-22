@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: none
+# SPDX-License-Identifier: CC0-1.0
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -130,3 +133,6 @@ dmypy.json
 
 # Kate
 .kate-swp
+
+#
+JUnitTestResults.xml

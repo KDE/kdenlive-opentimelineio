@@ -1,7 +1,7 @@
 {
     "OTIO_SCHEMA": "Timeline.1", 
     "metadata": {}, 
-    "name": "transition_test", 
+    "name": "GeneratorReferenceTest",
     "tracks": {
         "OTIO_SCHEMA": "Stack.1", 
         "children": [

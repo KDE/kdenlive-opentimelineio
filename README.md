@@ -1,3 +1,7 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+# SPDX-FileCopyrightText: 2022 Julius Künzel <jk.kdedev@smartlab.uber.space>
+
+
 # OpenTimelineIO Kdenlive Adapter
 
 This repository contains the OpenTimelineIO adapter for the Kdenlive file format (`*.kdenlive`). It is distributed under the MIT License.
