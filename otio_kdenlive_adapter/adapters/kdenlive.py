@@ -20,16 +20,18 @@ except ImportError:
     from urllib import unquote
 
 marker_types = {
-    0: otio.schema.MarkerColor.PURPLE,
-    1: otio.schema.MarkerColor.CYAN,
-    2: otio.schema.MarkerColor.BLUE,
-    3: otio.schema.MarkerColor.GREEN,
-    4: otio.schema.MarkerColor.YELLOW,
-    5: otio.schema.MarkerColor.ORANGE,
-    6: otio.schema.MarkerColor.RED,
-    7: otio.schema.MarkerColor.PINK,
-    8: otio.schema.MarkerColor.MAGENTA
+    0: (otio.schema.MarkerColor.PURPLE, '#9b59b6'),
+    1: (otio.schema.MarkerColor.CYAN, '#3daee9'),
+    2: (otio.schema.MarkerColor.BLUE, '#1abc9c'),
+    3: (otio.schema.MarkerColor.GREEN, '#1cdc9a'),
+    4: (otio.schema.MarkerColor.YELLOW, '#c9ce3b'),
+    5: (otio.schema.MarkerColor.ORANGE, '#fdbc4b'),
+    6: (otio.schema.MarkerColor.RED, '#f39c1f'),
+    7: (otio.schema.MarkerColor.PINK, '#f47750'),
+    8: (otio.schema.MarkerColor.MAGENTA, '#da4453')
 }
+
+marker_categories = {}
 
 
 def read_property(element, name):
@@ -85,7 +87,7 @@ def read_markers(markers_array, json_string, rate):
             marker = otio.schema.Marker(
                 name=json_marker["comment"],
                 marked_range=time_range,
-                color=marker_types[json_marker["type"]]
+                color=marker_types[json_marker["type"]][0]
             )
             markers_array.append(marker)
 
@@ -357,7 +359,7 @@ def write_markers(markers):
     for marker in markers:
         try:
             marker_type = [
-                key for key in marker_types.items() if key[1] == marker.color
+                key for key in marker_types.items() if key[1][0] == marker.color
             ][0][0]
         except Exception:
             marker_type = 0
@@ -368,6 +370,16 @@ def write_markers(markers):
                 "type": marker_type
             }
         )
+        if marker_type not in marker_categories:
+            # Since Kdenlive 22.12.0 there are no static build-in
+            # categories anymore instead you can create as many
+            # custom categories as you want.
+            # Hence we need to create categories now.
+            marker_categories[marker_type] = {
+                "color": marker_types[marker_type][1],
+                "comment": f"Category {len(marker_categories)+1}",
+                "index": marker_type
+            }
     return json.dumps(markers_array)
 
 
@@ -641,6 +653,10 @@ def write_to_string(input_otio):
             dict(producer='unsupported'),
         )
         write_property(entry, 'kdenlive:id', '3')
+
+    # Process marker/guide categories
+    write_property(main_bin, 'kdenlive:docproperties.guidesCategories',
+                   json.dumps(list(marker_categories.values())))
 
     return minidom.parseString(ET.tostring(mlt)).toprettyxml(
         encoding=sys.getdefaultencoding(),
