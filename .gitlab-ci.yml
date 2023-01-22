@@ -39,6 +39,7 @@ test:
     - pytest --cov=./ --junitxml=JUnitTestResults.xml
     - echo "Linting code..."
     - flake8 --show-source --statistics --output-file=flake8Output.txt
+  after_script:
     - flake8_junit flake8Output.txt JUnitLintResults.xml
   artifacts:
     reports:
