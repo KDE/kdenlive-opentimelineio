@@ -439,10 +439,11 @@ def write_to_string(input_otio):
     media_prod = {}
     producer_array = {}
     for clip in input_otio.find_clips():
-        producer, producer_count = _make_producer(
+        producer, producer_count, key = _make_producer(
             producer_count, clip, mlt, rate, media_prod
         )
-        key = _prod_key_from_item(clip, None)
+        if key is None:
+            continue
         if producer is None:
             # There is already a producer for this clip
             # make sure it covers the clip's range
@@ -687,6 +688,7 @@ def _make_producer(count, item, mlt, frame_rate, media_prod, speed=None,
                    is_audio=None):
     producer = None
     service, resource, effect_speed, _ = _prod_key_from_item(item, is_audio)
+    key = None
     if service and resource:
         producer_id = "producer{}".format(count)
         kdenlive_id = str(count + 4)  # unsupported starts with id 3
@@ -775,15 +777,15 @@ def _make_producer(count, item, mlt, frame_rate, media_prod, speed=None,
         # create time warped version
         if speed is None and effect_speed is not None:
             # Make video resped producer
-            _, count = _make_producer(
+            _, count, _ = _make_producer(
                 count, item, mlt, frame_rate, media_prod, effect_speed, False
             )
             # Make audio resped producer
-            _, count = _make_producer(
+            _, count, _ = _make_producer(
                 count, item, mlt, frame_rate, media_prod, effect_speed, True
             )
 
-    return producer, count
+    return producer, count, key
 
 
 def _prod_key_from_item(item, is_audio):
@@ -810,7 +812,8 @@ def _prod_key_from_item(item, is_audio):
             service = "avformat-novalidate"
 
         for effect in item.effects:
-            if isinstance(effect, otio.schema.LinearTimeWarp):
+            if (isinstance(effect, otio.schema.LinearTimeWarp)
+               and not isinstance(effect, otio.schema.FreezeFrame)):
                 if speed is None:
                     speed = 1
                 speed *= effect.time_scalar
