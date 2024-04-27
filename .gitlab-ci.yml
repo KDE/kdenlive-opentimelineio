@@ -54,28 +54,32 @@ deploy-to-gitlab:
   stage: deploy
   when: manual
   environment: development
+  variables:
+    PYPI_REPOR_NAME:
   script:
     - pip install twine
     - TWINE_PASSWORD=${CI_JOB_TOKEN} TWINE_USERNAME=gitlab-ci-token python -m twine upload --repository-url ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi dist/*
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
-deploy-to-test-pypi-org:
+.pypi-deploy:
   stage: deploy
   when: manual
   environment: production
   script:
+    - git clone https://invent.kde.org/sysadmin/ci-utilities.git
+    - git clone https://invent.kde.org/sysadmin/ci-notary-service.git
     - pip install twine
-    - TWINE_PASSWORD=${TESTPYPIORG_TOKEN} TWINE_USERNAME=${TESTPYPIORG_USERNAME} python -m twine upload --repository testpypi dist/*
+    - python3 -u ci-notary-service/publishonpypi.py --config ci-utilities/signing/publishonpypi.ini --repository $PYPI_REPOR_NAME dist
   rules:
     - if: $CI_COMMIT_TAG
 
+deploy-to-test-pypi-org:
+  extends: .pypi-deploy
+  variables:
+    PYPI_REPOR_NAME: testpypi
+
 deploy-to-pypi-org:
-  stage: deploy
-  when: manual
-  environment: production
-  script:
-    - pip install build twine
-    - TWINE_PASSWORD=${PYPIORG_TOKEN} TWINE_USERNAME=${PYPIORG_USERNAME} python -m twine upload --repository pypi dist/*
-  rules:
-    - if: $CI_COMMIT_TAG
+  extends: .pypi-deploy
+  variables:
+    PYPI_REPOR_NAME: pypi
