@@ -42,6 +42,7 @@ test:
     - pytest --cov=./ --junitxml=JUnitTestResults.xml
     - echo "Linting code..."
     - flake8 --show-source --statistics --output-file=flake8Output.txt
+    - echo "Done!"
   after_script:
     - pip install flake8-junit-report
     - flake8_junit flake8Output.txt JUnitLintResults.xml
@@ -54,8 +55,6 @@ deploy-to-gitlab:
   stage: deploy
   when: manual
   environment: development
-  variables:
-    PYPI_REPOR_NAME:
   script:
     - pip install twine
     - TWINE_PASSWORD=${CI_JOB_TOKEN} TWINE_USERNAME=gitlab-ci-token python -m twine upload --repository-url ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi dist/*
