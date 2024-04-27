@@ -70,16 +70,16 @@ deploy-to-gitlab:
     - git clone https://invent.kde.org/sysadmin/ci-utilities.git
     - git clone https://invent.kde.org/sysadmin/ci-notary-service.git
     - pip install twine
-    - python3 -u ci-notary-service/publishonpypi.py --config ci-utilities/signing/publishonpypi.ini --repository $PYPI_REPOR_NAME dist
+    - python3 -u ci-notary-service/publishonpypi.py --config ci-utilities/signing/publishonpypi.ini --repository $PYPI_REPO_NAME dist
   rules:
     - if: $CI_COMMIT_TAG
 
 deploy-to-test-pypi-org:
   extends: .pypi-deploy
   variables:
-    PYPI_REPOR_NAME: testpypi
+    PYPI_REPO_NAME: testpypi
 
 deploy-to-pypi-org:
   extends: .pypi-deploy
   variables:
-    PYPI_REPOR_NAME: pypi
+    PYPI_REPO_NAME: pypi
