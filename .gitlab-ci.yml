@@ -9,7 +9,9 @@ before_script:
   - pip install -r requirements.txt
 
 include:
-  - https://invent.kde.org/sysadmin/ci-utilities/raw/master/gitlab-templates/reuse-lint.yml
+  - project: sysadmin/ci-utilities
+    file:
+      - /gitlab-templates/reuse-lint.yml
 
 reuse:
   before_script: echo "Skip before_script"
