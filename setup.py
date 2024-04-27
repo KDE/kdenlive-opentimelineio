@@ -16,7 +16,7 @@ setuptools.setup(
     description="Short description of your plugin",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://invent.kde.org/jlskuz/otio-kdenlive-adapter",
+    url="https://invent.kde.org/multimedia/otio-kdenlive-adapter",
     packages=setuptools.find_packages(),
     entry_points={
         "opentimelineio.plugins": "otio_kdenlive_adapter = otio_kdenlive_adapter"

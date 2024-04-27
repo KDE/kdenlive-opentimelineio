@@ -6,10 +6,7 @@ before_script:
   - pip install virtualenv
   - virtualenv venv
   - source venv/bin/activate
-  # TODO: at the moment the release package does still contain
-  # the kdenlive adapter and we need to use the git version
-  - pip install git+https://github.com/AcademySoftwareFoundation/OpenTimelineIO
-#  - pip install -V OpenTimelineIO
+  - pip install -r requirements.txt
 
 include:
   - https://invent.kde.org/sysadmin/ci-utilities/raw/master/gitlab-templates/reuse-lint.yml
@@ -27,6 +24,7 @@ stages:
 build:
   stage: build
   script:
+    - pip install -r build-requirements.txt
     - python setup.py bdist_wheel
     - pip install dist/*
   artifacts:
@@ -36,7 +34,7 @@ build:
 test:
   stage: test
   script:
-    - pip install pytest-cov flake8
+    - pip install -r test-requirements.txt
     - pip install dist/*
     - echo "Running unit tests..."
     - pytest --cov=./ --junitxml=JUnitTestResults.xml
