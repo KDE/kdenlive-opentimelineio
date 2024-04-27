@@ -44,6 +44,7 @@ test:
     - flake8 --show-source --statistics --output-file=flake8Output.txt
     - echo "Done!"
   after_script:
+    - source venv/bin/activate
     - pip install flake8-junit-report
     - flake8_junit flake8Output.txt JUnitLintResults.xml
   artifacts:
