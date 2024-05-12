@@ -57,9 +57,9 @@ def time(clock, rate):
         # It's technically wrong. Or at least, I believe
         # it's written assuming an integer frame rate)
         f = (
-            round(secs * rate)
-            + int(mins * 60 * rate)
-            + int(hours * 3600 * rate)
+            round(secs * rate) +
+            int(mins * 60 * rate) +
+            int(hours * 3600 * rate)
         )
     else:
         f = hms[0]
@@ -123,15 +123,15 @@ def item_from_xml(xml_item, rate, byid, bin_producer_name):
         available_range = otio.opentime.TimeRange.range_from_start_end_time(
             start_time=time(producer.get('in'), rate),
             end_time_exclusive=(
-                time(producer.get('out'), rate)
-                + otio.opentime.RationalTime(1, rate)
+                time(producer.get('out'), rate) +
+                otio.opentime.RationalTime(1, rate)
             ),
         )
         source_range = otio.opentime.TimeRange.range_from_start_end_time(
             start_time=time(xml_item.get('in'), rate),
             end_time_exclusive=(
-                time(xml_item.get('out'), rate)
-                + otio.opentime.RationalTime(1, rate)
+                time(xml_item.get('out'), rate) +
+                otio.opentime.RationalTime(1, rate)
             ),
         )
         # media reference clip
@@ -149,8 +149,8 @@ def item_from_xml(xml_item, rate, byid, bin_producer_name):
                 generator_kind='SolidColor',
                 parameters={'color': read_property(producer, 'resource')},
                 available_range=available_range)
-        elif (service == 'frei0r.test_pat_B'
-              and read_property(producer, '0') == '4'):
+        elif (service == 'frei0r.test_pat_B' and
+              read_property(producer, '0') == '4'):
             # producer is a smpt bar clip
             reference = otio.schema.GeneratorReference(
                 generator_kind='SMPTEBars',
@@ -171,9 +171,9 @@ def item_from_xml(xml_item, rate, byid, bin_producer_name):
                 clip.effects.append(otio.schema.Effect(
                     effect_name=kdenlive_id,
                     metadata={'duration':
-                              time(effect.get('out'), rate)
-                              - time(effect.get('in',
-                                                producer.get('in')), rate)
+                              time(effect.get('out'), rate) -
+                              time(effect.get('in',
+                                              producer.get('in')), rate)
                               }))
             elif kdenlive_id in ['volume', 'brightness']:
                 clip.effects.append(otio.schema.Effect(
@@ -188,8 +188,8 @@ def resize_item(item, delta, right):
     """Resize an item and keep its position (no ripple)
     by resizing the neighbors too"""
     item.source_range = otio.opentime.TimeRange(
-        start_time=(item.source_range.start_time
-                    - (delta if not right else otio.opentime.RationalTime(0))),
+        start_time=(item.source_range.start_time -
+                    (delta if not right else otio.opentime.RationalTime(0))),
         duration=item.source_range.duration + delta
     )
     if right:
@@ -217,8 +217,8 @@ def read_from_string(input_str):
     used for same-track transitions"""
     mlt, byid = ET.XMLID(input_str)
     profile = mlt.find('profile')
-    rate = (float(profile.get('frame_rate_num'))
-            / float(profile.get('frame_rate_den', 1)))
+    rate = (float(profile.get('frame_rate_num')) /
+            float(profile.get('frame_rate_den', 1)))
 
     main_bin = mlt.find("playlist[@id='main_bin']")
     bin_producer_name = {}
@@ -289,8 +289,8 @@ def read_from_string(input_str):
 
             found_clip = track.find_clips(
                 search_range=otio.opentime.TimeRange.range_from_start_end_time(
-                    start_time=(time(mix.get('in'), rate)
-                                - otio.opentime.RationalTime(
+                    start_time=(time(mix.get('in'), rate) -
+                                otio.opentime.RationalTime(
                                     1 if before_mix_cut.value == 0 else 1)),
                     end_time_exclusive=(time(mix.get('out'), rate))
                 ))[0]
@@ -377,7 +377,7 @@ def write_markers(markers):
             # Hence we need to create categories now.
             marker_categories[marker_type] = {
                 "color": marker_types[marker_type][1],
-                "comment": f"Category {len(marker_categories)+1}",
+                "comment": f"Category {len(marker_categories) + 1}",
                 "index": marker_type
             }
     return json.dumps(markers_array)
@@ -387,8 +387,8 @@ def write_to_string(input_otio):
     """Write a timeline to Kdenlive project
     Re-creating the bin storing all used source clips
     and constructing the tracks"""
-    if (not isinstance(input_otio, otio.schema.Timeline)
-            and len(input_otio) > 1):
+    if (not isinstance(input_otio, otio.schema.Timeline) and
+            len(input_otio) > 1):
         print('WARNING: Only one timeline supported, using the first one.')
         input_otio = input_otio[0]
     # Project header & metadata
@@ -738,8 +738,8 @@ def _make_producer(count, item, mlt, frame_rate, media_prod, speed=None,
                                'set.test_image', "1" if is_audio else "0")
                 start_time = otio.opentime.RationalTime(
                     round(
-                        available_range.start_time.value
-                        / speed
+                        available_range.start_time.value /
+                        speed
                     ),
                     available_range.start_time.rate,
                 )
@@ -767,8 +767,8 @@ def _make_producer(count, item, mlt, frame_rate, media_prod, speed=None,
             )
             write_property(producer, 'kdenlive:id', kdenlive_id)
             if (isinstance(item.media_reference,
-                           otio.schema.GeneratorReference)
-                    and item.media_reference.generator_kind == 'SMPTEBars'):
+                           otio.schema.GeneratorReference) and
+                    item.media_reference.generator_kind == 'SMPTEBars'):
                 # set the type of the test pattern to SMPTE (value 4)
                 write_property(producer, '0', '4')
 
@@ -812,8 +812,8 @@ def _prod_key_from_item(item, is_audio):
             service = "avformat-novalidate"
 
         for effect in item.effects:
-            if (isinstance(effect, otio.schema.LinearTimeWarp)
-               and not isinstance(effect, otio.schema.FreezeFrame)):
+            if (isinstance(effect, otio.schema.LinearTimeWarp) and
+               not isinstance(effect, otio.schema.FreezeFrame)):
                 if speed is None:
                     speed = 1
                 speed *= effect.time_scalar
