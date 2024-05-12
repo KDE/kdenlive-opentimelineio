@@ -13,7 +13,7 @@ setuptools.setup(
     name="otio-kdenlive-adapter",
     author="Kdenlive Community",
     author_email="kdenlive@kde.org",
-    version="0.0.1",
+    version="0.0.2",
     description="Short description of your plugin",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -28,7 +28,7 @@ setuptools.setup(
         ],
     },
     install_requires=[
-        "OpenTimelineIO >= 0.15.0"
+        "OpenTimelineIO >= 0.16.0"
     ],
     extras_require={
         "dev": [
