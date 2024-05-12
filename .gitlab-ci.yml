@@ -49,6 +49,8 @@ test:
     - flake8_junit flake8Output.txt JUnitLintResults.xml
   artifacts:
     reports:
+      expire_in: 3 days
+      when: always
       junit: JUnit*Results.xml
 
 
