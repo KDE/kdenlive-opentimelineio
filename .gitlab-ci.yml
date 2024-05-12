@@ -48,9 +48,9 @@ test:
     - pip install flake8-junit-report
     - flake8_junit flake8Output.txt JUnitLintResults.xml
   artifacts:
+    expire_in: 3 days
+    when: always
     reports:
-      expire_in: 3 days
-      when: always
       junit: JUnit*Results.xml
 
 
