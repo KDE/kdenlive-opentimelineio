@@ -41,7 +41,7 @@ test:
     - echo "Running unit tests..."
     - pytest --cov=./ --junitxml=JUnitTestResults.xml
     - echo "Linting code..."
-    - flake8 --show-source --statistics --output-file=flake8Output.txt
+    - flake8 --show-source --statistics --tee --output-file=flake8Output.txt
     - echo "Done!"
   after_script:
     - source venv/bin/activate
