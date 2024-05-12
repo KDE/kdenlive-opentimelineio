@@ -4,12 +4,14 @@
 # SPDX-FileCopyrightText: 2021 "splidje"
 # SPDX-FileCopyrightText: 2022 Julius Künzel <jk.kdedev@smartlab.uber.space>
 
+import os
 import unittest
+from xml.etree import ElementTree as ET
+
 import opentimelineio as otio
 import opentimelineio.test_utils as otio_test_utils
+
 import otio_kdenlive_adapter.adapters.kdenlive as kdenlive_adapter
-import os
-from xml.etree import ElementTree as ET
 
 
 def prepare_for_check(timeline):
@@ -32,6 +34,54 @@ class AdaptersKdenliveTest(unittest.TestCase, otio_test_utils.OTIOAssertions):
         super(AdaptersKdenliveTest, self).__init__(*args, **kwargs)
 
     def test_library_roundtrip(self):
+        timeline = otio.adapters.read_from_file(
+            os.path.join(os.path.dirname(__file__), "sample_data",
+                         "kdenlive_example_v240770.kdenlive"))
+
+        # check tracks
+        self.assertIsNotNone(timeline)
+        self.assertEqual(len(timeline.tracks), 5)
+
+        self.assertEqual(len(timeline.video_tracks()), 2)
+        self.assertEqual(len(timeline.audio_tracks()), 3)
+
+        # check clips
+        clip_urls = (('AUD0002.OGG',),
+                     ('AUD0001.OGG', 'AUD0001.OGG'),
+                     ('VID0001.MKV', 'VID0001.MKV'),
+                     ('VID0001.MKV', 'VID0001.MKV'),
+                     ('VID0002.MKV', 'VID0003.MKV'))
+
+        for n, track in enumerate(timeline.tracks):
+            self.assertTupleEqual(
+                clip_urls[n],
+                tuple(c.media_reference.target_url
+                      for c in track
+                      if isinstance(c, otio.schema.Clip) and
+                      isinstance(
+                          c.media_reference,
+                          otio.schema.ExternalReference)))
+
+        # check timeline markers
+        self.assertEqual(len(timeline.tracks.markers), 2)
+
+        markers_data = ((230, 'Purple Marker', otio.schema.MarkerColor.PURPLE),
+                        (466, 'Green', otio.schema.MarkerColor.GREEN))
+
+        for n, marker in enumerate(timeline.tracks.markers):
+            self.assertEqual(0, marker.marked_range.duration.to_frames())
+            self.assertEqual(markers_data[n][0],
+                             marker.marked_range.start_time.to_frames())
+            self.assertEqual(markers_data[n][1], marker.name)
+            self.assertEqual(markers_data[n][2], marker.color)
+
+        kdenlive_xml = otio.adapters.write_to_string(timeline, "kdenlive")
+        self.assertIsNotNone(kdenlive_xml)
+
+        new_timeline = otio.adapters.read_from_string(kdenlive_xml, "kdenlive")
+        self.assertJsonEqual(timeline, new_timeline)
+
+    def test_v22_11_70__file_roundtrip(self):
         timeline = otio.adapters.read_from_file(
             os.path.join(os.path.dirname(__file__), "sample_data",
                          "kdenlive_example_v221170.kdenlive"))
@@ -255,8 +305,8 @@ class AdaptersKdenliveTest(unittest.TestCase, otio_test_utils.OTIOAssertions):
         ))
         self.assertEqual(before_mix_cut, otio.opentime.RationalTime(16, rate))
         self.assertEqual(after_mix_cut,
-                         otio.opentime.RationalTime(2 * rate, rate)
-                         - otio.opentime.RationalTime(16, rate))
+                         otio.opentime.RationalTime(2 * rate, rate) -
+                         otio.opentime.RationalTime(16, rate))
         self.assertTrue(reverse)
 
     def test_read_clip_markers(self):
@@ -333,10 +383,10 @@ class AdaptersKdenliveTest(unittest.TestCase, otio_test_utils.OTIOAssertions):
         for track in new_timeline.tracks:
             for clip in track.find_clips():
                 self.assertIsNotNone(clip.media_reference.available_range)
-                self.assertTrue(clip.source_range.start_time
-                                >= clip.available_range().start_time)
-                self.assertTrue(clip.source_range.end_time_inclusive()
-                                <= clip.available_range().end_time_inclusive())
+                self.assertTrue(clip.source_range.start_time >=
+                                clip.available_range().start_time)
+                self.assertTrue(clip.source_range.end_time_inclusive() <=
+                                clip.available_range().end_time_inclusive())
 
     def test_clock_time(self):
         tc = "00:00:01.040"

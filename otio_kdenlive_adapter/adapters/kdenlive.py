@@ -5,19 +5,24 @@
 # SPDX-FileCopyrightText: 2022 Julius Künzel <jk.kdedev@smartlab.uber.space>
 
 """Kdenlive (MLT XML) Adapter."""
-import re
-import os
-import sys
-from xml.etree import ElementTree as ET
-from xml.dom import minidom
-import opentimelineio as otio
 import json
+import os
+import re
+import sys
+from enum import Enum
+from xml.dom import minidom
+from xml.etree import ElementTree as ET
+
+import opentimelineio as otio
+
 try:
-    from urllib.parse import urlparse, unquote
+    from urllib.parse import unquote, urlparse
 except ImportError:
     # Python 2
-    from urlparse import urlparse
     from urllib import unquote
+
+    from urlparse import urlparse
+
 
 marker_types = {
     0: (otio.schema.MarkerColor.PURPLE, '#9b59b6'),
@@ -32,6 +37,29 @@ marker_types = {
 }
 
 marker_categories = {}
+
+# From definitions.h in Kdenlive source code
+
+
+class ProducerType(Enum):
+    Unknown = 0,
+    Audio = 1
+    Video = 2
+    AV = 3
+    Color = 4
+    Image = 5
+    Text = 6
+    SlideShow = 7
+    Virtual = 8
+    Playlist = 9
+    WebVfx = 10
+    TextTemplate = 11
+    QText = 12
+    Composition = 13
+    Track = 14
+    Qml = 15
+    Animation = 16
+    Timeline = 17
 
 
 def read_property(element, name):
@@ -208,6 +236,34 @@ def resize_item(item, delta, right):
             )
 
 
+def get_maintracktor(mlt, byid, docversion):
+    maintractor = mlt.find("tractor[@global_feed='1']")
+    if maintractor is not None:
+        return maintractor
+
+    # global_feed is no longer set in newer kdenlive versions
+    alltractors = mlt.findall("tractor")
+    # the last tractor is the main tractor
+    maintractor = alltractors[-1]
+    if float(docversion) < float("1.1"):
+        # for files without nested timelines
+        # check all other tractors are used as tracks
+        for tractor in alltractors[:-1]:
+            query = "track[@producer='%s']" % tractor.attrib['id']
+            if maintractor.find(query) is None:
+                raise RuntimeError(
+                    "Some tractors are neither the main tractor nor used as track")
+        return maintractor
+    else:
+        # for project with nested timeline support (since 1.1)
+        # the last tractor is only a wrap to the last opened tractor
+        # which we consider to be the main tractor
+        if int(read_property(maintractor, 'kdenlive:projectTractor')) != 1:
+            return None
+        pid = maintractor.find('track').get('producer')
+        return byid[pid]
+
+
 def read_from_string(input_str):
     """Read a Kdenlive project (MLT XML)
     Kdenlive uses a given MLT project layout, similar to Shotcut,
@@ -221,6 +277,7 @@ def read_from_string(input_str):
             float(profile.get('frame_rate_den', 1)))
 
     main_bin = mlt.find("playlist[@id='main_bin']")
+    docversion = read_property(main_bin, "kdenlive:docproperties.version")
     bin_producer_name = {}
     for entry in main_bin.findall('entry'):
         producer = byid[entry.get('producer')]
@@ -230,21 +287,21 @@ def read_from_string(input_str):
     timeline = otio.schema.Timeline(
         name=mlt.get('name', 'Kdenlive imported timeline'))
 
-    maintractor = mlt.find("tractor[@global_feed='1']")
-    # global_feed is no longer set in newer kdenlive versions
+    maintractor = get_maintracktor(mlt, byid, docversion)
+
     if maintractor is None:
-        alltractors = mlt.findall("tractor")
-        # the last tractor is the main tractor
-        maintractor = alltractors[-1]
-        # check all other tractors are used as tracks
-        for tractor in alltractors[:-1]:
-            if maintractor.find("track[@producer='%s']" % tractor.attrib['id']) is None:
-                raise RuntimeError("Can't find main tractor")
+        raise RuntimeError("Can't find main tractor")
 
     for maintrack in maintractor.findall('track'):
-        if maintrack.get('producer') == 'black_track':
+        btid = 'black_track'
+        if maintrack.get('producer') == btid:
             continue
+
         subtractor = byid[maintrack.get('producer')]
+
+        if read_property(subtractor, 'kdenlive:playlistid') == btid:
+            continue
+
         stack = otio.schema.Stack()
 
         subtracks = subtractor.findall('track')
@@ -320,10 +377,14 @@ def read_from_string(input_str):
                     out_offset=time(transition.get('out'), rate)))
 
     # process timeline markers
-    read_markers(timeline.tracks.markers,
-                 read_property(main_bin, "kdenlive:docproperties.guides"),
-                 rate)
-
+    if float(docversion) < float("1.1"):
+        read_markers(timeline.tracks.markers,
+                     read_property(main_bin, "kdenlive:docproperties.guides"),
+                     rate)
+    else:
+        read_markers(timeline.tracks.markers,
+                     read_property(maintractor, "kdenlive:sequenceproperties.guides"),
+                     rate)
     return timeline
 
 

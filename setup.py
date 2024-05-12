@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: 2022 The KDE Community
 
 import io
+
 import setuptools
 
 with io.open("README.md", "r", encoding="utf-8") as f:
