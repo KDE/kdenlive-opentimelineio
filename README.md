@@ -8,9 +8,9 @@
 
 This repository contains the OpenTimelineIO adapter for the Kdenlive file format (`*.kdenlive`). It is distributed under the MIT License.
 
-# ATTENTION!!! REPOSITORY IN PREPERATION PHASE
+# HELP NEEDED!
 
-At the moment the Kdenlive adapter is still part of the OpenTimelineIO core. To be installed via `python -m pip install opentimelineio` there is a ongoing efford to split all adapters from the core. As part of this the Kdenlive adapter will move here and get his own pypi.org python package soon.
+Please note that this adapter is behind the quickly evolving features of Kdenlive and hence might be unstable. We are looking for help to maintain the OpenTimelineIO support for Kdenlive. The long term goal is to add prober support to the C++ source code of Kdenlive to replace this Python adapter. If you like to help, we are happy to hear from you!
 
 ## What is Kdenlive?
 
@@ -33,8 +33,6 @@ For more information about this, including supported formats, see: https://opent
 A list of tools and projects using OpenTimelineIO can be found [here](https://github.com/AcademySoftwareFoundation/OpenTimelineIO/wiki/Tools-and-Projects-Using-OpenTimelineIO).
 
 ## Installing
-
-**ATTENTION: THIS SECTION IS NOT YET VALID, see note on top of this document**
 
 As a user you can usually just install the adapter through the Kdenlive user interface or directly from pypi.org with this command
 
