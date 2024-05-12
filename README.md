@@ -10,7 +10,7 @@ This repository contains the OpenTimelineIO adapter for the Kdenlive file format
 
 # HELP NEEDED!
 
-Please note that this adapter is behind the quickly evolving features of Kdenlive and hence might be unstable. We are looking for help to maintain the OpenTimelineIO support for Kdenlive. The long term goal is to add prober support to the C++ source code of Kdenlive to replace this Python adapter. If you like to help, we are happy to hear from you!
+Please note that this adapter is behind the quickly evolving features of Kdenlive and hence might be unstable. We are looking for help to maintain the OpenTimelineIO support for Kdenlive. The long term goal is to add proper support to the C++ source code of Kdenlive to replace this Python adapter. If you like to help, we are happy to hear from you!
 
 ## What is Kdenlive?
 
