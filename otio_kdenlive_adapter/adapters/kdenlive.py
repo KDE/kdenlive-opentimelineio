@@ -149,7 +149,7 @@ def item_from_xml(xml_item, rate, byid, bin_producer_name):
         producer = byid[xml_item.get('producer')]
         service = read_property(producer, 'mlt_service')
         available_range = otio.opentime.TimeRange.range_from_start_end_time(
-            start_time=time(producer.get('in'), rate),
+            start_time=time(producer.get('in') or "00:00:00.000", rate),
             end_time_exclusive=(
                 time(producer.get('out'), rate) +
                 otio.opentime.RationalTime(1, rate)
