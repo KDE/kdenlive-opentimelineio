@@ -259,7 +259,7 @@
         <property name="meta.media.progressive">1</property>
         <property name="kdenlive:orig_service">avformat-novalidate</property>
     </producer>
-    <producer id="producer0" in="00:00:00.000" out="00:00:04.960">
+    <chain id="chain0" out="00:00:04.960">
         <property name="length">00:00:05.000</property>
         <property name="eof">pause</property>
         <property name="resource">0x2a3158ff</property>
@@ -272,7 +272,7 @@
         <property name="kdenlive:file_hash">466ccb917e30c2d39bcd72068d75e4df</property>
         <property name="mlt_image_format">rgb</property>
         <property name="kdenlive:clip_type">2</property>
-    </producer>
+    </chain>
     <producer id="producer6" in="00:00:00.000" out="00:00:04.960">
         <property name="length">125</property>
         <property name="eof">pause</property>
@@ -681,7 +681,7 @@
         <property name="kdenlive:orig_service">avformat-novalidate</property>
     </producer>
     <playlist id="playlist6">
-        <entry in="00:00:00.000" out="00:00:02.920" producer="producer0">
+        <entry in="00:00:00.000" out="00:00:02.920" producer="chain0">
             <property name="kdenlive:id">7</property>
             <filter id="filter15" out="00:00:00.360">
                 <property name="start">1</property>
@@ -1156,7 +1156,7 @@
         <entry in="00:00:00.000" out="00:00:39.120" producer="producer5"/>
         <entry in="00:00:00.000" out="00:00:12.280" producer="producer1"/>
         <entry in="00:00:00.000" out="00:00:26.840" producer="producer3"/>
-        <entry in="00:00:00.000" out="00:00:04.960" producer="producer0"/>
+        <entry in="00:00:00.000" out="00:00:04.960" producer="chain0"/>
         <entry in="00:00:00.000" out="00:00:04.960" producer="producer6"/>
         <entry in="00:00:00.000" out="00:00:34.480" producer="{b80eb17b-4c07-42f7-8e40-28cc48266d95}"/>
     </playlist>

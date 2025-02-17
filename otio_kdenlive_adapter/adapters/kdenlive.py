@@ -73,6 +73,8 @@ def time(clock, rate):
     """Decode an MLT time
     which is either a frame count or a timecode string
     after format hours:minutes:seconds.floatpart"""
+    if clock is None:
+        return otio.opentime.RationalTime(0, rate)
     hms = [float(x) for x in clock.replace(',', '.').split(':')]
     if len(hms) > 1:
         smh = list(reversed(hms))
