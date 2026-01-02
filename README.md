@@ -3,14 +3,15 @@
     SPDX-FileCopyrightText: 2022 Julius Künzel <jk.kdedev@smartlab.uber.space>
 -->
 
+# DEPRECATED
+
+This OpenTimelineIO adapter is deprecated and not maintained anymore! Kdenlive has native support for OpenTimelineIO since version 25.04. This native integration offers more features and works much more reliable than the adapter does. See our [documentation for details](https://docs.kdenlive.org/en/user_interface/menu/file_menu.html#opentimelineio-import).
+
+---
 
 # OpenTimelineIO Kdenlive Adapter
 
 This repository contains the OpenTimelineIO adapter for the Kdenlive file format (`*.kdenlive`). It is distributed under the MIT License.
-
-# HELP NEEDED!
-
-Please note that this adapter is behind the quickly evolving features of Kdenlive and hence might be unstable. We are looking for help to maintain the OpenTimelineIO support for Kdenlive. The long term goal is to add proper support to the C++ source code of Kdenlive to replace this Python adapter. If you like to help, we are happy to hear from you!
 
 ## What is Kdenlive?
 
