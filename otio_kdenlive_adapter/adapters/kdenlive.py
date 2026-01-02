@@ -271,6 +271,9 @@ def read_from_string(input_str):
     and a "global_feed" tractor for timeline.
     Timeline tracks include virtual sub-track,
     used for same-track transitions"""
+
+    print("This OpenTimelineIO adapter is deprecated and not maintained anymore! Kdenlive has native support for OpenTimelineIO since version 25.04. This native integration offers more features and works much more reliable than the adapter does.")
+
     mlt, byid = ET.XMLID(input_str)
     profile = mlt.find('profile')
     rate = (float(profile.get('frame_rate_num')) /
@@ -448,6 +451,9 @@ def write_to_string(input_otio):
     """Write a timeline to Kdenlive project
     Re-creating the bin storing all used source clips
     and constructing the tracks"""
+
+    print("This OpenTimelineIO adapter is deprecated and not maintained anymore! Kdenlive has native support for OpenTimelineIO since version 25.04. This native integration offers more features and works much more reliable than the adapter does.")
+
     if (not isinstance(input_otio, otio.schema.Timeline) and
             len(input_otio) > 1):
         print('WARNING: Only one timeline supported, using the first one.')
