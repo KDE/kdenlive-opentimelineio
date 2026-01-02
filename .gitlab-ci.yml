@@ -77,6 +77,8 @@ deploy-to-gitlab:
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   artifacts:
+    expire_in: 3 days
+    when: always
     paths:
       - task.log
       - task-debug.log
