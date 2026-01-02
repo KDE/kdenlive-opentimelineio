@@ -272,7 +272,13 @@ def read_from_string(input_str):
     Timeline tracks include virtual sub-track,
     used for same-track transitions"""
 
-    print("This OpenTimelineIO adapter is deprecated and not maintained anymore! Kdenlive has native support for OpenTimelineIO since version 25.04. This native integration offers more features and works much more reliable than the adapter does.")
+    print("""
+!!!!!!
+This OpenTimelineIO adapter is deprecated and not maintained anymore!
+Kdenlive has native support for OpenTimelineIO since version 25.04. This native
+integration offers more features and works much more reliable
+than the adapter does.
+""")
 
     mlt, byid = ET.XMLID(input_str)
     profile = mlt.find('profile')
@@ -452,7 +458,13 @@ def write_to_string(input_otio):
     Re-creating the bin storing all used source clips
     and constructing the tracks"""
 
-    print("This OpenTimelineIO adapter is deprecated and not maintained anymore! Kdenlive has native support for OpenTimelineIO since version 25.04. This native integration offers more features and works much more reliable than the adapter does.")
+    print("""
+!!!!!!
+This OpenTimelineIO adapter is deprecated and not maintained anymore!
+Kdenlive has native support for OpenTimelineIO since version 25.04. This native
+integration offers more features and works much more reliable
+than the adapter does.
+""")
 
     if (not isinstance(input_otio, otio.schema.Timeline) and
             len(input_otio) > 1):
